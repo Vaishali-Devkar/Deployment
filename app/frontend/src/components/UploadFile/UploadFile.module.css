@@ -1,0 +1,41 @@
+.container {
+    display: flex;
+    align-items: center;
+    gap: 0.375em;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.callout {
+    padding: 1em;
+    min-height: 6.25em;
+}
+
+.list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.item {
+    width: 15.625em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0.75em;
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
