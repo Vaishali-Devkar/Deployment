@@ -369,7 +369,7 @@ python-dateutil==2.9.0.post0
     #   microsoft-kiota-serialization-text
     #   pendulum
     #   time-machine
-python-dotenv==1.0.1
+python-dotenv==1.1.0
     # via
     #   -r requirements.in
     #   prompty
