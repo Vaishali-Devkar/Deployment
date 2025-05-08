@@ -375,14 +375,18 @@ async def upload(auth_claims: dict[str, Any]):
         current_app.logger.info("Creating directory for user %s", user_oid)
         await user_directory_client.create_directory()
     await user_directory_client.set_access_control(owner=user_oid)
-    file_client = user_directory_client.get_file_client(file.filename)
+
+    filename = file.filename
+    if group_access == "true":
+    filename = f"[grp]_{filename}"  # <-- Append prefix if group access is true
+    file_io.name = filename
+    file_client = user_directory_client.get_file_client(filename)
     file_io = file
-    file_io.name = file.filename
+    file_io.name = file.filename  
     file_io = io.BufferedReader(file_io)
     await file_client.upload_data(file_io, overwrite=True, metadata={"UploadedBy": user_oid})
     file_io.seek(0)
     ingester: UploadUserFileStrategy = current_app.config[CONFIG_INGESTER]
-
     if group_access == "true":
         await ingester.add_file(File(content=file_io, acls={"oids": [user_oid],"groups":user_groups}, url=file_client.url))
     else:
@@ -414,7 +418,11 @@ async def list_uploaded(auth_claims: dict[str, Any]):
     try:
         all_paths = user_blob_container_client.get_paths(path=user_oid)
         async for path in all_paths:
-            files.append(path.name.split("/", 1)[1])
+           # files.append(path.name.split("/", 1)[1])
+           filename = path.name.split("/", 1)[1]
+           is_group = filename.startswith("[grp]_")
+           clean_name = filename[7:] if is_group else filename
+           files.append({"name": clean_name, "is_group": is_group})
     except ResourceNotFoundError as error:
         if error.status_code != 404:
             current_app.logger.exception("Error listing uploaded files", error)

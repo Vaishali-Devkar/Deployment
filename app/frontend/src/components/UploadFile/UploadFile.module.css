@@ -39,3 +39,10 @@
     height: 16px;
     cursor: pointer;
 }
+
+.groupTag {
+    color: green;
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  

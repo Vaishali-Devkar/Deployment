@@ -22,7 +22,8 @@ export const UploadFile: React.FC<Props> = ({ className, disabled }: Props) => {
     const [deletionStatus, setDeletionStatus] = useState<{ [filename: string]: "pending" | "error" | "success" }>({});
     const [uploadedFile, setUploadedFile] = useState<SimpleAPIResponse>();
     const [uploadedFileError, setUploadedFileError] = useState<string>();
-    const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+    //const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+    const [uploadedFiles, setUploadedFiles] = useState<{ name: string; is_group: boolean }[]>([]);
     const [isGroupAccess, setIsGroupAccess] = useState<boolean>(false);
     const { t } = useTranslation();
 
@@ -53,7 +54,17 @@ export const UploadFile: React.FC<Props> = ({ className, disabled }: Props) => {
         listUploadedFilesApi(idToken).then(files => {
             setIsLoading(false);
             setDeletionStatus({});
-            setUploadedFiles(files);
+            //setUploadedFiles(files);
+            // Transform each filename into an object with name and is_group
+        const transformedFiles = files.map((filename: string) => {
+            const is_group = filename.startsWith("[grp]_");
+            return {
+                name: is_group ? filename.slice(7) : filename,
+                is_group
+            };
+        });
+
+        setUploadedFiles(transformedFiles);
         });
     };
 
@@ -149,17 +160,23 @@ export const UploadFile: React.FC<Props> = ({ className, disabled }: Props) => {
                         {uploadedFiles.map((filename, index) => {
                             return (
                                 <div key={index} className={styles.list}>
-                                    <div className={styles.item}>{filename}</div>
+                                    <div className={styles.item}>
+                                    {filename.is_group && <span className={styles.groupTag}>G </span>}
+                                    {filename.name}
+                                    </div>
                                     {/* Button to remove a file from the list */}
                                     <Button
                                         icon={<Delete24Regular />}
-                                        onClick={() => handleRemoveFile(filename)}
-                                        disabled={deletionStatus[filename] === "pending" || deletionStatus[filename] === "success"}
+                                        onClick={() => {
+                                            const actualFilename = filename.is_group ? `[grp]_` + filename.name : filename.name;
+                                            handleRemoveFile(actualFilename)
+                                            }}
+                                        disabled={deletionStatus[filename.name] === "pending" || deletionStatus[filename.name] === "success"}
                                     >
-                                        {!deletionStatus[filename] && t("upload.deleteFile")}
-                                        {deletionStatus[filename] == "pending" && t("upload.deletingFile")}
-                                        {deletionStatus[filename] == "error" && t("upload.errorDeleting")}
-                                        {deletionStatus[filename] == "success" && t("upload.fileDeleted")}
+                                        {!deletionStatus[filename.name] && t("upload.deleteFile")}
+                                        {deletionStatus[filename.name] == "pending" && t("upload.deletingFile")}
+                                        {deletionStatus[filename.name] == "error" && t("upload.errorDeleting")}
+                                        {deletionStatus[filename.name] == "success" && t("upload.fileDeleted")}
                                     </Button>
                                 </div>
                             );
