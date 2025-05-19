@@ -55,6 +55,8 @@ export function parseAnswerToHtml(answer: ChatAppResponse, isStreaming: boolean,
     const parts = parsedAnswer.split(/\[([^\]]+)\]/g);
 
     const fragments: string[] = parts.map((part, index) => {
+        const displayName = part.startsWith("grp__") ? part.slice(5) : part;
+        console.log(displayName)
         if (index % 2 === 0) {
             return part;
         } else {
@@ -71,10 +73,11 @@ export function parseAnswerToHtml(answer: ChatAppResponse, isStreaming: boolean,
                 citationIndex = citations.length;
             }
 
+            
             const path = getCitationFilePath(part);
 
             return renderToStaticMarkup(
-                <a className="supContainer" title={part} onClick={() => onCitationClicked(path)}>
+                <a className="supContainer" title={displayName} onClick={() => onCitationClicked(path)}>
                     <sup>{citationIndex}</sup>
                 </a>
             );

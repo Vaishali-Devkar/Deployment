@@ -109,10 +109,11 @@ export const Answer = ({
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
                         <span className={styles.citationLearnMore}>{t("citationWithColon")}</span>
                         {parsedAnswer.citations.map((x, i) => {
+                            const displayName = x.startsWith("grp__") ? x.slice(5) : x;
                             const path = getCitationFilePath(x);
                             return (
-                                <a key={i} className={styles.citation} title={x} onClick={() => onCitationClicked(path)}>
-                                    {`${++i}. ${x}`}
+                                <a key={i} className={styles.citation} title={displayName} onClick={() => onCitationClicked(path)}>
+                                    {`${++i}. ${displayName}`}
                                 </a>
                             );
                         })}
